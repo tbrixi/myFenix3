@@ -1,0 +1,11 @@
+<properties>
+    <property id="BackgroundColor" type="number">0x000000</property>
+    <property id="DateColor" type="number">0x00AAFF</property>
+    <property id="DigitalTimeColor" type="number">0xFFFFFF</property>
+    <property id="AnalogTimeColor" type="number">0xAAAAAA</property>
+    <property id="HRColor" type="number">0xFF0000</property>
+    <property id="StepColor" type="number">0x00AAFF</property>
+    <property id="StepProgressColor" type="number">0x00AAFF</property>
+    <property id="DistanceColor" type="number">0x00AAFF</property>
+    <property id="CaloriesColor" type="number">0x00AAFF</property>
+</properties>
