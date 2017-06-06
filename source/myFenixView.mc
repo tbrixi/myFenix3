@@ -7,12 +7,11 @@ using Toybox.Application as App;
 
 class myFenixView extends Ui.WatchFace
 {
-
 	var screenWidth;
 	var screenHeight;
 	var screenPercent;
 	var centerX;
-	var centerY;	
+	var centerY;
 	var sleepMode = false;
 
 	function initialize() {
@@ -24,7 +23,7 @@ class myFenixView extends Ui.WatchFace
 		screenHeight = dc.getHeight();
 		screenPercent = screenWidth.toFloat() / 100;
 		centerX = screenWidth / 2;
-		centerY = screenHeight / 2;		
+		centerY = screenHeight / 2;
 
 		setLayout(Rez.Layouts.WatchFace(dc));
 	}
@@ -37,7 +36,7 @@ class myFenixView extends Ui.WatchFace
 
 	function onUpdate(dc) {
 		View.onUpdate(dc);
-		
+
 		renderBatery(dc);
 		renderDate(dc);
 		renderCalories(dc);
@@ -50,7 +49,7 @@ class myFenixView extends Ui.WatchFace
 		renderAlarm(dc);
 		renderNotification(dc);
 		renderHR(dc);
-		
+
 		renderHands(dc);
 	}
 
@@ -61,14 +60,14 @@ class myFenixView extends Ui.WatchFace
 	function onEnterSleep() {
 	 	sleepMode = true;
  	}
- 	
+
  	function renderBatery(dc)
 	{
 		var xPercent = 50;
 		var yPercent = 18;
 		var batteryLevel = Sys.getSystemStats().battery;
 		var batteryString = Lang.format("$1$%", [batteryLevel.format("%01d")]);
-		
+
 		dc.setColor(Gfx.COLOR_GREEN, Gfx.COLOR_TRANSPARENT);
 
 		if (batteryLevel < 50)
@@ -80,7 +79,7 @@ class myFenixView extends Ui.WatchFace
 		{
 			dc.setColor(Gfx.COLOR_RED, Gfx.COLOR_TRANSPARENT);
 		}
-		
+
 		dc.drawText(xPercent * screenPercent, yPercent * screenPercent, Gfx.FONT_TINY, batteryString, Gfx.TEXT_JUSTIFY_CENTER);
 	}
 
@@ -95,7 +94,7 @@ class myFenixView extends Ui.WatchFace
 		var year = nowInfo.year;
 		var dayOfWeek = nowInfo.day_of_week;
 		var dateString = Lang.format("$1$ $2$ $3$", [dayOfWeek, day, month]);
-		
+
 		dc.setColor(App.getApp().getProperty("DateColor"), Gfx.COLOR_TRANSPARENT);
 		dc.drawText(xPercent * screenPercent, yPercent * screenPercent, Gfx.FONT_TINY, dateString, Gfx.TEXT_JUSTIFY_CENTER);
 	}
@@ -114,7 +113,7 @@ class myFenixView extends Ui.WatchFace
 				hours = hours - 12;
 			}
 		}
-		
+
 		if (!sleepMode)
 		{
 			timeString = Lang.format("$1$:$2$:$3$", [hours, clockTime.min.format("%02d"), clockTime.sec.format("%02d")]);
@@ -123,7 +122,7 @@ class myFenixView extends Ui.WatchFace
 		{
 			timeString = Lang.format("$1$:$2$", [hours, clockTime.min.format("%02d")]);
 		}
-		
+
 		dc.setColor(App.getApp().getProperty("DigitalTimeColor"), Gfx.COLOR_TRANSPARENT);
 		dc.drawText(xPercent * screenPercent, yPercent * screenPercent, Gfx.FONT_LARGE, timeString, Gfx.TEXT_JUSTIFY_CENTER);
 	}
@@ -138,16 +137,16 @@ class myFenixView extends Ui.WatchFace
 			var yPercent = 75;
 			var stepGoal = info.stepGoal;
 			var stepsString = Lang.format("$1$", [steps.format("%01d")]);
-			
+
 			dc.setColor(App.getApp().getProperty("StepColor"), Gfx.COLOR_TRANSPARENT);
 			dc.drawText(xPercent * screenPercent, yPercent * screenPercent, Gfx.FONT_TINY, stepsString, Gfx.TEXT_JUSTIFY_CENTER);
-			
+
 			var stepsStringWidth = dc.getTextWidthInPixels(stepsString, Gfx.FONT_TINY);
 			var icon = Ui.loadResource(Rez.Drawables.step);
 			var yIco = yPercent + 2;
 			var gap = 5;
 			dc.drawBitmap(xPercent * screenPercent + stepsStringWidth / 2 + gap, screenPercent * yIco, icon);
-		
+
 			dc.setColor(App.getApp().getProperty("StepProgressColor"), Gfx.COLOR_TRANSPARENT);
 
 			var width = screenWidth / 3;
@@ -166,30 +165,58 @@ class myFenixView extends Ui.WatchFace
 	function renderDistance(dc)
 	{
 		var info = ActivityMonitor.getInfo();
-		var distance = info.distance / 100;
-		if (distance > 0)
+		var meter = info.distance / 100;
+		if (meter > 0)
 		{
-			var xPercent = 75;
+			var xPercent = 72;
 			var yPercent = 45;
-			var distanceString;
-			
-			if (distance < 999)
+			var distanceString = "";
+			var feetScale = 3.2808399;
+			var mileScale = 1609.344;
+
+			var unit = Sys.getDeviceSettings().distanceUnits;
+
+			if (unit == Sys.UNIT_METRIC)
 			{
-				distanceString = Lang.format("$1$m", [distance.format("%01d")]);
-			}
-			else
-			{
-				var km = distance.toFloat() / 1000;
-				if (distance < 100000)
+				if (meter < 999)
 				{
-					distanceString = Lang.format("$1$km", [km.format("%0.2f")]);
+					distanceString = Lang.format("$1$m", [meter.format("%01d")]);
 				}
 				else
 				{
-					distanceString = Lang.format("$1$km", [km.format("%0.1f")]);
-				}	
+					var km = meter.toFloat() / 1000;
+					if (km.toNumber() < 100)
+					{
+						distanceString = Lang.format("$1$km", [km.format("%0.2f")]);
+					}
+					else
+					{
+						distanceString = Lang.format("$1$km", [km.format("%0.1f")]);
+					}
+				}
 			}
-			
+
+			if (unit == Sys.UNIT_STATUTE)
+			{
+				var feet = meter * feetScale;
+				if (feet.toNumber() < 999)
+				{
+					distanceString = Lang.format("$1$ft", [feet.format("%01d")]);
+				}
+				else
+				{
+					var miles = meter.toFloat() / mileScale;
+					if (miles.toNumber() < 100)
+					{
+						distanceString = Lang.format("$1$mi", [miles.format("%0.2f")]);
+					}
+					else
+					{
+						distanceString = Lang.format("$1$mi", [miles.format("%0.1f")]);
+					}
+				}
+			}
+
 			dc.setColor(App.getApp().getProperty("DistanceColor"), Gfx.COLOR_TRANSPARENT);
 			dc.drawText(xPercent * screenPercent, yPercent * screenPercent, Gfx.FONT_TINY, distanceString, Gfx.TEXT_JUSTIFY_CENTER);
 		}
@@ -211,7 +238,7 @@ class myFenixView extends Ui.WatchFace
 	function renderHR(dc)
 	{
 		if (ActivityMonitor has :getHeartRateHistory)
-		{		
+		{
 			var hrIter = ActivityMonitor.getHeartRateHistory(null, true);
 			var hr = hrIter.next();
 			var bpm = (hr.heartRate != ActivityMonitor.INVALID_HR_SAMPLE && hr.heartRate > 0) ? hr.heartRate : 0;
@@ -219,10 +246,10 @@ class myFenixView extends Ui.WatchFace
 			{
 				var xPercent = 90;
 				var yPercent = 57;
-				var bpmString = bpm.toString();	
+				var bpmString = bpm.toString();
 				dc.setColor(App.getApp().getProperty("HRColor"), Gfx.COLOR_TRANSPARENT);
 				dc.drawText(xPercent * screenPercent, yPercent * screenPercent, Gfx.FONT_TINY, bpmString, Gfx.TEXT_JUSTIFY_RIGHT);
-	
+
 				var icon = Ui.loadResource(Rez.Drawables.bpm);
 				var xIco = 92;
 				var yIco = 60;
@@ -320,7 +347,7 @@ class myFenixView extends Ui.WatchFace
 		dc.drawText(0, screenHeight/2, Gfx.FONT_LARGE, numArray[3],Gfx.TEXT_JUSTIFY_LEFT + Gfx.TEXT_JUSTIFY_VCENTER);
 
 		dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_TRANSPARENT);
-		
+
 		var max = centerX;
 		var min = max - 20;
 		var width = 10;
@@ -396,7 +423,7 @@ class myFenixView extends Ui.WatchFace
 			dc.drawBitmap(xPercent * screenPercent, yPercent * screenPercent, icon);
 		}
 	}
-	
+
 	function trace(value)
 	{
 		System.println("trace: " + value);
