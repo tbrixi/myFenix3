@@ -4,4 +4,5 @@
     <bitmap id="bluetooth" filename="bluetooth.png" />
     <bitmap id="alarm" filename="alarm.png" />
     <bitmap id="notification" filename="notification.png" />
+    <bitmap id="step" filename="step.png" />
 </drawables>
