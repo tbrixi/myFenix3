@@ -418,14 +418,9 @@ class myFenixView extends Ui.WatchFace
 		if (notificationCount > 0)
 		{
 			var xPercent = 79;
-			var yPercent = 17;
+			var yPercent = 16;
 			var icon = Ui.loadResource(Rez.Drawables.notification);
 			dc.drawBitmap(xPercent * screenPercent, yPercent * screenPercent, icon);
 		}
-	}
-
-	function trace(value)
-	{
-		System.println("trace: " + value);
 	}
 }
