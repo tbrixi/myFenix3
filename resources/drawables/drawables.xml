@@ -1,5 +1,5 @@
 <drawables>
-    <bitmap id="LauncherIcon" filename="launcher_icon.png" />
+    <bitmap id="launcherIcon" filename="launcher_icon.png" />
     <bitmap id="bpm" filename="bpm.png" />
     <bitmap id="bluetooth" filename="bluetooth.png" />
     <bitmap id="alarm" filename="alarm.png" />
